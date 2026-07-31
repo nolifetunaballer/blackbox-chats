@@ -1,0 +1,847 @@
+<div id="app"></div>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&display=swap');
+
+#app, #app * { box-sizing: border-box; font-family: 'Work Sans', sans-serif; }
+
+:root {
+  --bg-void: #0c0a09;
+  --bg-rail: #060504;
+  --bg-panel: #131110;
+  --bg-main: #17140f;
+  --bg-elevated: #211c17;
+  --bg-input: #1c1712;
+  --brass: #c9973d;
+  --brass-dim: #7a5b25;
+  --brass-glow: rgba(201,151,61,0.35);
+  --wine: #9a3535;
+  --wine-dim: #5e2020;
+  --text-primary: #ece5d8;
+  --text-secondary: #a89d89;
+  --text-faint: #5c5448;
+  --border: #2a2420;
+  --border-soft: #201c18;
+}
+
+#app { width: 100%; min-height: 600px; background: var(--bg-void); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+
+.headline { font-family: 'Bebas Neue', sans-serif; letter-spacing: 1.5px; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+button { cursor: pointer; font-family: inherit; }
+input, textarea, select { font-family: inherit; }
+
+.bb-scroll::-webkit-scrollbar { width: 6px; }
+</style>
+
+<script>
+(function(){
+
+const LOGO_DATA_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGXCAIAAAAS2JEjAAAAAXNSR0IArs4c6QAAIABJREFUeAHtnd9PFMmix/vpvvV/MC++8NCPN5lkko0JITFmYgwhxhtCJOvFeALEJUdPwo8Nd92r4NFdXVkyriGOK+Iv3HXZqJy9ISPGxfWq69UFBXFHEVYEncMyjDMwwzBD9123PEXZ3dNT3TPADP3lQWuq6+enqr5dVV0/BAF/IAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACIAACtiGwbt26avyBAAjYnsC6devyQPbWrVun4A8EQMD2BCBYtq8CAAAC+UMAgpU/ZYWUgoDtCUCwbF8FAAAE8ocABCt/ygopBQHbE4Bg2b4KAAAI5A8BCFb+lBVSCgK2J5DfgrV79+7/xB8IgMBaJKArznkvWHmwigxJBAEQMEng3/7t3yBYJpnBOQiAwCoRgGCtEnhECwIgYJ4ABMs8M/gAARBYJQIQrFUCj2hBAATME4BgmWcGHyAAAqtEAIK1SuARLQiAgHkCECzzzOADBEBglQhAsFYJPKIFARAwTwCCZZ4ZfIAACKwSAQjWKoFHtCAAAuYJ2F2wXC5XW1tbx/L/tbS0FBQUmC8g+AABEFgiYHfBKi8vD4fDuruTsms5PT29devWJfDpTKIofvjhh16v1+fzPXjwYM+ePel8pHnu9XrT5sjr9aYJJf8f79y589SpUz6f79GjRwcOHMjZDDkcjo8++ujUqVM3b968c+dOaWlpziZ1JRMGwVohwYpEIhUVFfxFW1RU9PLlSyIx8Xh83759/H51XUKwCJahoSEq3Lks0OyrNBwOl5eX6xar3SwhWCskWGZFB4K1TE0RgrVMYFcmWLsLlsPhKC0tbWhooN2ZYDA4wPH36tUr8qKOxWJDQ0NpffT39zc2NvIXatYF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';
+
+// ---------- utilities ----------
+function esc(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(prefix){ return (prefix||'id')+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8); }
+function pairKey(a,b){ return [a,b].sort().join('__'); }
+function fmtTime(ts){ const d=new Date(ts); let h=d.getHours(); const m=d.getMinutes().toString().padStart(2,'0'); const ap=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12; return h+':'+m+' '+ap; }
+function fmtDay(ts){ const d=new Date(ts); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'}); }
+const PALETTE = ['#c9973d','#8b5a3d','#a34e4e','#5a7a6b','#6b6b8b','#8a7a4a','#4a6b7a','#9a6a3d'];
+function hashColor(name){ let h=0; for(let i=0;i<name.length;i++) h=name.charCodeAt(i)+((h<<5)-h); return PALETTE[Math.abs(h)%PALETTE.length]; }
+function initial(name){ return (name||'?').charAt(0).toUpperCase(); }
+
+function avatarHTML(nameOrObj, size, opts){
+  size = size || 36; opts = opts || {};
+  let name, avatar;
+  if(typeof nameOrObj === 'string'){ name = nameOrObj; avatar = (State.usersCache[name]||{}).avatar; }
+  else { name = nameOrObj.username; avatar = nameOrObj.avatar; }
+  const extra = opts.onclick ? ` onclick="${opts.onclick}" style="cursor:pointer;"` : '';
+  const ring = opts.status ? statusDot(opts.status, size) : '';
+  let inner;
+  if(avatar){
+    inner = `<img src="${avatar}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;display:block;" />`;
+  } else {
+    inner = `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${hashColor(name)};display:flex;align-items:center;justify-content:center;font-weight:600;color:#0c0a09;font-size:${Math.floor(size*0.42)}px;">${esc(initial(name))}</div>`;
+  }
+  return `<div style="position:relative;flex-shrink:0;"${extra}>${inner}${ring}</div>`;
+}
+function statusDot(status, parentSize){
+  const colors = {online:'#c9973d', idle:'#9a7a3d', dnd:'#9a3535', invisible:'#5c5448', offline:'#5c5448'};
+  const d = Math.max(9, Math.floor(parentSize*0.28));
+  return `<div style="position:absolute;bottom:-1px;right:-1px;width:${d}px;height:${d}px;border-radius:50%;background:${colors[status]||colors.offline};border:2px solid var(--bg-panel);"></div>`;
+}
+
+// ---------- storage ----------
+async function sGet(key, shared){
+  if(shared===undefined) shared = true;
+  try { const r = await window.storage.get(key, shared); return r ? JSON.parse(r.value) : null; }
+  catch(e){ return null; }
+}
+async function sSet(key, value, shared){
+  if(shared===undefined) shared = true;
+  try { await window.storage.set(key, JSON.stringify(value), shared); return true; }
+  catch(e){ console.error('storage set failed', key, e); return false; }
+}
+async function sDel(key, shared){
+  if(shared===undefined) shared = true;
+  try { await window.storage.delete(key, shared); return true; } catch(e){ return false; }
+}
+const SESSION_KEY = 'blackbox-remembered-session';
+
+// ---------- state ----------
+const State = {
+  user: null,
+  view: {type:'home'},
+  friends: [],
+  servers: {},
+  groups: {},
+  usersCache: {},
+  poll: null,
+  authMode: 'login',
+  authError: '',
+};
+
+async function fetchUser(username){
+  if(State.usersCache[username]) return State.usersCache[username];
+  const u = await sGet('user:'+username.toLowerCase());
+  if(u) State.usersCache[username] = u;
+  return u;
+}
+
+// ---------- auth ----------
+function renderAuth(){
+  const isLogin = State.authMode === 'login';
+  document.getElementById('app').innerHTML = `
+  <div style="min-height:600px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 20%, #1a1611 0%, #0c0a09 70%);padding:40px 20px;">
+    <div style="width:100%;max-width:360px;">
+      <div style="text-align:center;margin-bottom:28px;">
+        <div style="width:92px;height:92px;border-radius:14px;overflow:hidden;margin:0 auto 14px;box-shadow:0 0 24px var(--brass-glow);border:2px solid var(--brass-dim);">
+          <img src="${LOGO_DATA_URI}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="BlackBox" />
+        </div>
+        <div class="headline" style="font-size:36px;letter-spacing:3px;color:var(--text-primary);">BLACKBOX</div>
+        <div style="font-size:12px;color:var(--text-faint);letter-spacing:2px;margin-top:2px;">NO EMAIL. NO NITRO. JUST A ROOM AND A DOOR.</div>
+      </div>
+      <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:28px 24px;">
+        <div style="font-size:18px;font-weight:600;margin-bottom:18px;">${isLogin?'Sign in':'Create an account'}</div>
+        ${State.authError ? `<div style="background:rgba(154,53,53,0.15);border:1px solid var(--wine-dim);color:#e2a3a3;font-size:13px;padding:8px 12px;border-radius:6px;margin-bottom:14px;">${esc(State.authError)}</div>` : ''}
+        <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Username</label>
+        <input id="auth-username" placeholder="e.g. nightowl" maxlength="20" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:14px;outline:none;" onkeydown="if(event.key==='Enter')document.getElementById('auth-password').focus()"/>
+        <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Password</label>
+        <input id="auth-password" type="password" placeholder="••••••••" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:${isLogin?'20':'14'}px;outline:none;" onkeydown="if(event.key==='Enter'){ ${isLogin?'submitLogin()':"document.getElementById('auth-password2').focus()"} }"/>
+        ${!isLogin ? `<label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Confirm password</label>
+        <input id="auth-password2" type="password" placeholder="••••••••" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:20px;outline:none;" onkeydown="if(event.key==='Enter')submitRegister()"/>` : ''}
+        <button onclick="${isLogin?'submitLogin()':'submitRegister()'}" style="width:100%;background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:11px;border-radius:6px;font-size:14px;letter-spacing:0.5px;">${isLogin?'Sign in':'Create account'}</button>
+        <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-secondary);">
+          ${isLogin ? `New here? <a onclick="switchAuth('register')" style="color:var(--brass);cursor:pointer;">Create an account</a>` : `Already have one? <a onclick="switchAuth('login')" style="color:var(--brass);cursor:pointer;">Sign in</a>`}
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--text-faint);">Accounts live in shared storage on this artifact — anyone with this link can see usernames, profiles and messages. Don't use a real password you use elsewhere.</div>
+    </div>
+  </div>`;
+  setTimeout(()=>{ const el=document.getElementById('auth-username'); if(el) el.focus(); },50);
+}
+window.switchAuth = function(mode){ State.authMode = mode; State.authError=''; renderAuth(); }
+
+window.submitRegister = async function(){
+  const uname = (document.getElementById('auth-username').value||'').trim();
+  const pass = document.getElementById('auth-password').value||'';
+  const pass2 = document.getElementById('auth-password2').value||'';
+  if(!/^[a-zA-Z0-9_]{3,20}$/.test(uname)){ State.authError='Username must be 3-20 characters: letters, numbers, underscore only.'; renderAuth(); return; }
+  if(pass.length<4){ State.authError='Password must be at least 4 characters.'; renderAuth(); return; }
+  if(pass!==pass2){ State.authError='Passwords do not match.'; renderAuth(); return; }
+  const key = 'user:'+uname.toLowerCase();
+  const existing = await sGet(key);
+  if(existing){ State.authError='That username is taken.'; renderAuth(); return; }
+  const user = {username:uname, password:pass, bio:'', avatar:null, status:'online', createdAt:Date.now()};
+  await sSet(key, user);
+  await sSet('friends:'+uname.toLowerCase(), []);
+  await sSet('user-servers:'+uname.toLowerCase(), []);
+  await sSet('user-groups:'+uname.toLowerCase(), []);
+  State.usersCache[uname]=user;
+  await sSet(SESSION_KEY, uname, false);
+  await bootSession(user);
+}
+
+window.submitLogin = async function(){
+  const uname = (document.getElementById('auth-username').value||'').trim();
+  const pass = document.getElementById('auth-password').value||'';
+  if(!uname || !pass){ State.authError='Enter a username and password.'; renderAuth(); return; }
+  const user = await sGet('user:'+uname.toLowerCase());
+  if(!user || user.password !== pass){ State.authError='Wrong username or password.'; renderAuth(); return; }
+  State.usersCache[uname]=user;
+  await sSet(SESSION_KEY, user.username, false);
+  await bootSession(user);
+}
+
+async function bootSession(user){
+  State.user = user;
+  State.authError = '';
+  const uname = user.username.toLowerCase();
+  const [friends, serverIds, groupIds] = await Promise.all([
+    sGet('friends:'+uname), sGet('user-servers:'+uname), sGet('user-groups:'+uname)
+  ]);
+  State.friends = friends || [];
+  const servers = {}; const groups = {};
+  await Promise.all((serverIds||[]).map(async id=>{ const s = await sGet('server:'+id); if(s) servers[id]=s; }));
+  await Promise.all((groupIds||[]).map(async id=>{ const g = await sGet('group:'+id); if(g) groups[id]=g; }));
+  State.servers = servers; State.groups = groups;
+  await Promise.all(State.friends.map(f=>fetchUser(f)));
+  State.view = {type:'home'};
+  renderApp();
+  startPolling();
+}
+
+async function logout(){
+  stopPolling();
+  await sDel(SESSION_KEY, false);
+  State.user = null; State.friends=[]; State.servers={}; State.groups={}; State.usersCache={}; State.view={type:'home'};
+  renderAuth();
+}
+window.logout = logout;
+
+// ---------- polling ----------
+function startPolling(){
+  stopPolling();
+  State.poll = setInterval(async ()=>{
+    if(!State.user) return;
+    await refreshCurrentMessages(true);
+  }, 3500);
+}
+function stopPolling(){ if(State.poll){ clearInterval(State.poll); State.poll=null; } }
+
+function currentMsgKey(){
+  const v = State.view;
+  if(v.type==='dm') return 'msg:d:'+pairKey(State.user.username, v.username);
+  if(v.type==='group') return 'msg:g:'+v.id;
+  if(v.type==='server') return 'msg:s:'+v.id+':'+v.channelId;
+  return null;
+}
+
+async function refreshCurrentMessages(isPoll){
+  const key = currentMsgKey();
+  if(!key) return;
+  const msgs = await sGet(key) || [];
+  const box = document.getElementById('messages-list');
+  if(!box) return;
+  const prevCount = parseInt(box.getAttribute('data-count')||'0');
+  if(msgs.length !== prevCount || !isPoll){
+    box.innerHTML = renderMessagesHTML(msgs);
+    box.setAttribute('data-count', msgs.length);
+    const scroller = document.getElementById('messages-scroll');
+    if(scroller) scroller.scrollTop = scroller.scrollHeight;
+  }
+}
+
+// ---------- main app render ----------
+function renderApp(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+  <div style="display:flex;height:640px;">
+    ${renderRail()}
+    ${renderSidebar()}
+    ${renderMain()}
+  </div>
+  <div id="modal-root"></div>
+  `;
+  setTimeout(()=>{ const scroller=document.getElementById('messages-scroll'); if(scroller) scroller.scrollTop = scroller.scrollHeight; },30);
+}
+
+function renderRail(){
+  const serverList = Object.values(State.servers).sort((a,b)=>a.name.localeCompare(b.name));
+  let icons = serverList.map(s=>{
+    const active = State.view.type==='server' && State.view.id===s.id;
+    return `<div onclick="openServer('${s.id}')" title="${esc(s.name)}" style="width:48px;height:48px;border-radius:${active?'16px':'50%'};background:${s.icon?'transparent':'var(--bg-elevated)'};border:2px solid ${active?'var(--brass)':'var(--border)'};display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:10px;transition:border-radius .15s;overflow:hidden;box-shadow:${active?'0 0 12px var(--brass-glow)':'none'};">
+      ${s.icon ? `<img src="${s.icon}" style="width:100%;height:100%;object-fit:cover;"/>` : `<span class="headline" style="color:var(--brass);font-size:18px;">${esc(initial(s.name))}</span>`}
+    </div>`;
+  }).join('');
+  return `
+  <div style="width:80px;background:var(--bg-rail);display:flex;flex-direction:column;align-items:center;padding:14px 0;flex-shrink:0;overflow-y:auto;">
+    <div onclick="goHome()" title="Home" style="width:48px;height:48px;border-radius:${State.view.type==='home'?'16px':'50%'};background:transparent;border:2px solid ${State.view.type==='home'?'var(--brass)':'var(--border)'};display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:14px;overflow:hidden;transition:border-radius .15s;box-shadow:${State.view.type==='home'?'0 0 12px var(--brass-glow)':'none'};">
+      <img src="${LOGO_DATA_URI}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="BlackBox" />
+    </div>
+    <div style="width:32px;height:2px;background:var(--border);margin-bottom:14px;"></div>
+    ${icons}
+    <div onclick="openCreateServerModal()" title="Create or join a server" style="width:48px;height:48px;border-radius:50%;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--brass);font-size:22px;margin-top:2px;">+</div>
+  </div>`;
+}
+
+function renderSidebar(){
+  if(State.view.type==='server') return renderServerSidebar();
+  return renderHomeSidebar();
+}
+
+function renderHomeSidebar(){
+  const friendItems = State.friends.map(f=>{
+    const u = State.usersCache[f] || {username:f};
+    const active = State.view.type==='dm' && State.view.username===f;
+    return `<div onclick="openDM('${esc(f)}')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;background:${active?'var(--bg-elevated)':'transparent'};margin-bottom:2px;" onmouseover="this.style.background='var(--bg-elevated)'" onmouseout="this.style.background='${active?'var(--bg-elevated)':'transparent'}'">
+      ${avatarHTML(u,32,{status:u.status||'offline'})}
+      <div style="overflow:hidden;">
+        <div style="font-size:14px;font-weight:500;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${esc(f)}</div>
+      </div>
+    </div>`;
+  }).join('') || `<div style="color:var(--text-faint);font-size:13px;padding:8px 10px;">No one added yet.</div>`;
+
+  const groupItems = Object.values(State.groups).map(g=>{
+    const active = State.view.type==='group' && State.view.id===g.id;
+    return `<div onclick="openGroup('${g.id}')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;background:${active?'var(--bg-elevated)':'transparent'};margin-bottom:2px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--brass);font-size:13px;font-weight:600;">${esc(initial(g.name))}</div>
+      <div style="font-size:14px;font-weight:500;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${esc(g.name)}</div>
+    </div>`;
+  }).join('') || `<div style="color:var(--text-faint);font-size:13px;padding:8px 10px;">No group chats yet.</div>`;
+
+  return `
+  <div style="width:240px;background:var(--bg-panel);display:flex;flex-direction:column;border-right:1px solid var(--border-soft);">
+    <div style="padding:14px 14px 8px;border-bottom:1px solid var(--border-soft);">
+      <div class="headline" style="font-size:20px;letter-spacing:1px;color:var(--brass);">BLACKBOX</div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:12px 10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 4px 6px;">
+        <span style="font-size:11px;letter-spacing:1px;color:var(--text-secondary);text-transform:uppercase;">Direct messages</span>
+        <button onclick="openAddFriendModal()" title="Add someone" style="background:none;border:none;color:var(--brass);font-size:16px;line-height:1;">+</button>
+      </div>
+      ${friendItems}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 4px 6px;">
+        <span style="font-size:11px;letter-spacing:1px;color:var(--text-secondary);text-transform:uppercase;">Group chats</span>
+        <button onclick="openCreateGroupModal()" title="New group" style="background:none;border:none;color:var(--brass);font-size:16px;line-height:1;">+</button>
+      </div>
+      ${groupItems}
+    </div>
+    ${renderUserBar()}
+  </div>`;
+}
+
+function renderServerSidebar(){
+  const s = State.servers[State.view.id];
+  if(!s) return renderHomeSidebar();
+  const isOwner = s.owner === State.user.username;
+  const channels = (s.channels||[]).map(c=>{
+    const active = State.view.channelId===c.id;
+    return `<div onclick="openChannel('${s.id}','${c.id}')" style="display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:6px;cursor:pointer;background:${active?'var(--bg-elevated)':'transparent'};color:${active?'var(--text-primary)':'var(--text-secondary)'};margin-bottom:1px;font-size:14px;">
+      <span style="color:var(--text-faint);">#</span>${esc(c.name)}
+    </div>`;
+  }).join('');
+
+  return `
+  <div style="width:240px;background:var(--bg-panel);display:flex;flex-direction:column;border-right:1px solid var(--border-soft);">
+    <div style="padding:14px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(s.name)}</div>
+      <button onclick="openServerMenuModal('${s.id}')" title="Server options" style="background:none;border:none;color:var(--text-secondary);font-size:16px;">&#8942;</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:12px 10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 4px 6px;">
+        <span style="font-size:11px;letter-spacing:1px;color:var(--text-secondary);text-transform:uppercase;">Text channels</span>
+        <button onclick="openCreateChannelModal('${s.id}')" title="Add channel" style="background:none;border:none;color:var(--brass);font-size:16px;line-height:1;">+</button>
+      </div>
+      ${channels}
+      <div style="margin-top:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 4px 6px;">
+          <span style="font-size:11px;letter-spacing:1px;color:var(--text-secondary);text-transform:uppercase;">Members — ${(s.members||[]).length}</span>
+          <button onclick="openAddMemberModal('${s.id}')" title="Add member" style="background:none;border:none;color:var(--brass);font-size:16px;line-height:1;">+</button>
+        </div>
+        ${(s.members||[]).map(m=>{
+          const u = State.usersCache[m]||{username:m};
+          return `<div onclick="openProfileModal('${esc(m)}')" style="display:flex;align-items:center;gap:8px;padding:5px 4px;cursor:pointer;">
+            ${avatarHTML(u,24,{status:u.status||'offline'})}
+            <span style="font-size:13px;color:var(--text-secondary);">${esc(m)}${m===s.owner?' <span style=\"color:var(--brass);font-size:10px;\">OWNER</span>':''}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    ${renderUserBar()}
+  </div>`;
+}
+
+function renderUserBar(){
+  const u = State.user;
+  return `
+  <div style="padding:10px;border-top:1px solid var(--border-soft);display:flex;align-items:center;gap:8px;">
+    ${avatarHTML(u,34,{status:u.status||'online',onclick:`openProfileModal('${esc(u.username)}')`})}
+    <div style="flex:1;overflow:hidden;">
+      <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(u.username)}</div>
+      <div style="font-size:11px;color:var(--text-faint);text-transform:capitalize;">${esc(u.status||'online')}</div>
+    </div>
+    <button onclick="openEditProfileModal()" title="Edit profile" style="background:none;border:none;color:var(--text-secondary);font-size:15px;">&#9998;</button>
+    <button onclick="logout()" title="Log out" style="background:none;border:none;color:var(--text-secondary);font-size:15px;">&#9211;</button>
+  </div>`;
+}
+
+function headerTitleForView(){
+  const v = State.view;
+  if(v.type==='home') return {title:'Welcome', sub:'Pick a conversation or add someone new.'};
+  if(v.type==='dm') return {title:v.username, sub:''};
+  if(v.type==='group') return {title:(State.groups[v.id]||{}).name||'Group', sub:((State.groups[v.id]||{}).members||[]).length+' members'};
+  if(v.type==='server'){
+    const s = State.servers[v.id]; const c = (s.channels||[]).find(c=>c.id===v.channelId);
+    return {title:'# '+(c?c.name:''), sub:s.name};
+  }
+  return {title:'', sub:''};
+}
+
+function renderMain(){
+  const v = State.view;
+  if(v.type==='home'){
+    return `
+    <div style="flex:1;display:flex;flex-direction:column;background:var(--bg-main);align-items:center;justify-content:center;text-align:center;padding:40px;">
+      <div class="headline" style="font-size:44px;color:var(--brass);letter-spacing:2px;">BLACKBOX</div>
+      <div style="color:var(--text-secondary);margin-top:8px;max-width:360px;">Add a friend by username to start a conversation, spin up a group chat, or build yourself a server.</div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="openAddFriendModal()" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:9px 16px;border-radius:6px;font-size:13px;">Add someone</button>
+        <button onclick="openCreateServerModal()" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);padding:9px 16px;border-radius:6px;font-size:13px;">Create a server</button>
+      </div>
+    </div>`;
+  }
+  const h = headerTitleForView();
+  return `
+  <div style="flex:1;display:flex;flex-direction:column;background:var(--bg-main);min-width:0;">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div>
+        <div style="font-weight:600;font-size:15px;">${esc(h.title)}</div>
+        ${h.sub?`<div style="font-size:12px;color:var(--text-faint);">${esc(h.sub)}</div>`:''}
+      </div>
+    </div>
+    <div id="messages-scroll" class="bb-scroll" style="flex:1;overflow-y:auto;padding:16px 20px;">
+      <div id="messages-list" data-count="0"></div>
+    </div>
+    <div style="padding:12px 18px 18px;flex-shrink:0;">
+      <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;padding:4px 6px 4px 14px;">
+        <input id="msg-input" placeholder="Say something..." style="flex:1;background:transparent;border:none;color:var(--text-primary);padding:9px 0;font-size:14px;outline:none;" onkeydown="if(event.key==='Enter'){event.preventDefault();sendMessage();}"/>
+        <button onclick="sendMessage()" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:8px 16px;border-radius:6px;font-size:13px;">Send</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMessagesHTML(msgs){
+  if(!msgs || msgs.length===0) return `<div style="color:var(--text-faint);font-size:13px;text-align:center;margin-top:40px;">No messages yet. Break the silence.</div>`;
+  let out = ''; let lastAuthor=null; let lastTs=0; let lastDay='';
+  msgs.forEach(m=>{
+    const day = fmtDay(m.ts);
+    if(day !== lastDay){
+      out += `<div style="text-align:center;color:var(--text-faint);font-size:11px;margin:18px 0 10px;letter-spacing:1px;">${esc(day)}</div>`;
+      lastAuthor = null; lastDay = day;
+    }
+    const grouped = (m.author===lastAuthor) && (m.ts-lastTs < 4*60*1000);
+    if(!grouped){
+      out += `<div style="display:flex;gap:12px;margin-top:14px;">
+        ${avatarHTML(m.author,38,{onclick:`openProfileModal('${esc(m.author)}')`})}
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <span onclick="openProfileModal('${esc(m.author)}')" style="font-weight:600;font-size:14px;cursor:pointer;color:${hashColor(m.author)};">${esc(m.author)}</span>
+            <span style="font-size:11px;color:var(--text-faint);">${fmtTime(m.ts)}</span>
+          </div>
+          <div style="font-size:14px;color:var(--text-primary);margin-top:2px;line-height:1.5;word-break:break-word;">${esc(m.content)}</div>
+        </div>
+      </div>`;
+    } else {
+      out += `<div style="display:flex;gap:12px;">
+        <div style="width:38px;flex-shrink:0;"></div>
+        <div style="font-size:14px;color:var(--text-primary);line-height:1.5;word-break:break-word;">${esc(m.content)}</div>
+      </div>`;
+    }
+    lastAuthor = m.author; lastTs = m.ts;
+  });
+  return out;
+}
+
+// ---------- navigation ----------
+window.goHome = function(){ State.view = {type:'home'}; renderApp(); }
+
+window.openDM = async function(username){
+  await fetchUser(username);
+  State.view = {type:'dm', username};
+  renderApp();
+  await refreshCurrentMessages(false);
+}
+
+window.openGroup = async function(id){
+  State.view = {type:'group', id};
+  renderApp();
+  await refreshCurrentMessages(false);
+}
+
+window.openServer = async function(id){
+  const s = State.servers[id];
+  if(!s) return;
+  await Promise.all((s.members||[]).map(m=>fetchUser(m)));
+  const firstChannel = (s.channels||[])[0];
+  State.view = {type:'server', id, channelId: firstChannel?firstChannel.id:null};
+  renderApp();
+  await refreshCurrentMessages(false);
+}
+
+window.openChannel = async function(serverId, channelId){
+  State.view = {type:'server', id:serverId, channelId};
+  renderApp();
+  await refreshCurrentMessages(false);
+}
+
+// ---------- sending messages ----------
+window.sendMessage = async function(){
+  const input = document.getElementById('msg-input');
+  if(!input) return;
+  const content = input.value.trim();
+  if(!content) return;
+  input.value='';
+  const key = currentMsgKey();
+  if(!key) return;
+  const msg = {id:uid('m'), author: State.user.username, content, ts: Date.now()};
+  const existing = await sGet(key) || [];
+  existing.push(msg);
+  await sSet(key, existing);
+  await refreshCurrentMessages(false);
+}
+
+// ---------- modal helpers ----------
+function closeModal(){ const r=document.getElementById('modal-root'); if(r) r.innerHTML=''; }
+window.closeModal = closeModal;
+function showModal(html){
+  const r = document.getElementById('modal-root');
+  r.innerHTML = `<div onclick="if(event.target===this)closeModal()" style="position:fixed;inset:0;background:rgba(6,5,4,0.75);display:flex;align-items:center;justify-content:center;z-index:50;">${html}</div>`;
+}
+
+// ---- Add friend ----
+window.openAddFriendModal = function(){
+  showModal(`
+  <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:24px;width:340px;">
+    <div style="font-weight:600;font-size:16px;margin-bottom:14px;">Add someone</div>
+    <div id="addfriend-error" style="color:#e2a3a3;font-size:13px;margin-bottom:8px;"></div>
+    <input id="addfriend-username" placeholder="Their exact username" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:16px;outline:none;" onkeydown="if(event.key==='Enter')submitAddFriend()"/>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:8px 14px;border-radius:6px;font-size:13px;">Cancel</button>
+      <button onclick="submitAddFriend()" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:8px 14px;border-radius:6px;font-size:13px;">Add</button>
+    </div>
+  </div>`);
+  setTimeout(()=>{ const el=document.getElementById('addfriend-username'); if(el) el.focus(); },30);
+}
+window.submitAddFriend = async function(){
+  const uname = (document.getElementById('addfriend-username').value||'').trim();
+  const errBox = document.getElementById('addfriend-error');
+  if(!uname){ errBox.textContent='Enter a username.'; return; }
+  if(uname.toLowerCase()===State.user.username.toLowerCase()){ errBox.textContent="That's you."; return; }
+  const target = await sGet('user:'+uname.toLowerCase());
+  if(!target){ errBox.textContent='No user with that username.'; return; }
+  const realName = target.username;
+  if(State.friends.some(f=>f.toLowerCase()===realName.toLowerCase())){ errBox.textContent='Already added.'; return; }
+  State.friends.push(realName);
+  await sSet('friends:'+State.user.username.toLowerCase(), State.friends);
+  const theirFriends = await sGet('friends:'+realName.toLowerCase()) || [];
+  if(!theirFriends.some(f=>f.toLowerCase()===State.user.username.toLowerCase())){
+    theirFriends.push(State.user.username);
+    await sSet('friends:'+realName.toLowerCase(), theirFriends);
+  }
+  State.usersCache[realName]=target;
+  closeModal();
+  renderApp();
+}
+
+// ---- Create server ----
+window.openCreateServerModal = function(){
+  showModal(`
+  <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:24px;width:340px;">
+    <div style="font-weight:600;font-size:16px;margin-bottom:14px;">Create a server</div>
+    <input id="newserver-name" placeholder="Server name" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:16px;outline:none;"/>
+    <div style="border-top:1px solid var(--border-soft);margin:14px 0;padding-top:14px;">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Or join one you already know the ID for</div>
+      <input id="joinserver-id" placeholder="Server ID" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:8px;outline:none;"/>
+      <div id="joinserver-error" style="color:#e2a3a3;font-size:12px;"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:8px 14px;border-radius:6px;font-size:13px;">Cancel</button>
+      <button onclick="submitJoinServer()" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);padding:8px 14px;border-radius:6px;font-size:13px;">Join by ID</button>
+      <button onclick="submitCreateServer()" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:8px 14px;border-radius:6px;font-size:13px;">Create</button>
+    </div>
+  </div>`);
+  setTimeout(()=>{ const el=document.getElementById('newserver-name'); if(el) el.focus(); },30);
+}
+window.submitCreateServer = async function(){
+  const name = (document.getElementById('newserver-name').value||'').trim();
+  if(!name) return;
+  const id = uid('srv');
+  const server = {id, name, icon:null, owner:State.user.username, members:[State.user.username], channels:[{id:uid('ch'), name:'general'}]};
+  await sSet('server:'+id, server);
+  const list = await sGet('user-servers:'+State.user.username.toLowerCase()) || [];
+  list.push(id);
+  await sSet('user-servers:'+State.user.username.toLowerCase(), list);
+  State.servers[id]=server;
+  closeModal();
+  await openServer(id);
+}
+window.submitJoinServer = async function(){
+  const id = (document.getElementById('joinserver-id').value||'').trim();
+  const errBox = document.getElementById('joinserver-error');
+  if(!id) return;
+  const s = await sGet('server:'+id);
+  if(!s){ errBox.textContent='No server with that ID.'; return; }
+  if(!(s.members||[]).some(m=>m.toLowerCase()===State.user.username.toLowerCase())){
+    s.members.push(State.user.username);
+    await sSet('server:'+id, s);
+  }
+  const list = await sGet('user-servers:'+State.user.username.toLowerCase()) || [];
+  if(!list.includes(id)){ list.push(id); await sSet('user-servers:'+State.user.username.toLowerCase(), list); }
+  State.servers[id]=s;
+  closeModal();
+  await openServer(id);
+}
+
+// ---- Server menu (add member / channel / leave / delete / copy ID) ----
+window.openServerMenuModal = function(serverId){
+  const s = State.servers[serverId];
+  const isOwner = s.owner === State.user.username;
+  showModal(`
+  <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:24px;width:340px;">
+    <div style="font-weight:600;font-size:16px;margin-bottom:4px;">${esc(s.name)}</div>
+    <div style="font-size:12px;color:var(--text-faint);margin-bottom:16px;">Server ID (share to invite): <span style="color:var(--brass);">${s.id}</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button onclick="closeModal();openAddMemberModal('${s.id}')" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);padding:9px;border-radius:6px;font-size:13px;text-align:left;padding-left:14px;">Add a member</button>
+      <button onclick="closeModal();openCreateChannelModal('${s.id}')" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);padding:9px;border-radius:6px;font-size:13px;text-align:left;padding-left:14px;">Add a channel</button>
+      <button onclick="leaveServer('${s.id}')" style="background:var(--bg-elevated);border:1px solid var(--wine-dim);color:#e2a3a3;padding:9px;border-radius:6px;font-size:13px;text-align:left;padding-left:14px;">Leave server</button>
+      ${isOwner?`<button onclick="deleteServer('${s.id}')" style="background:var(--wine-dim);border:1px solid var(--wine);color:#fff;padding:9px;border-radius:6px;font-size:13px;text-align:left;padding-left:14px;">Delete server</button>`:''}
+    </div>
+    <div style="text-align:right;margin-top:16px;">
+      <button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:7px 14px;border-radius:6px;font-size:13px;">Close</button>
+    </div>
+  </div>`);
+}
+window.leaveServer = async function(serverId){
+  const s = State.servers[serverId];
+  s.members = (s.members||[]).filter(m=>m.toLowerCase()!==State.user.username.toLowerCase());
+  await sSet('server:'+serverId, s);
+  const list = (await sGet('user-servers:'+State.user.username.toLowerCase()) || []).filter(id=>id!==serverId);
+  await sSet('user-servers:'+State.user.username.toLowerCase(), list);
+  delete State.servers[serverId];
+  closeModal();
+  goHome();
+}
+window.deleteServer = async function(serverId){
+  const s = State.servers[serverId];
+  for(const m of (s.members||[])){
+    const list = (await sGet('user-servers:'+m.toLowerCase()) || []).filter(id=>id!==serverId);
+    await sSet('user-servers:'+m.toLowerCase(), list);
+  }
+  await sDel('server:'+serverId);
+  delete State.servers[serverId];
+  closeModal();
+  goHome();
+}
+
+// ---- Add member ----
+window.openAddMemberModal = function(serverId){
+  showModal(`
+  <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:24px;width:340px;">
+    <div style="font-weight:600;font-size:16px;margin-bottom:14px;">Add a member</div>
+    <div id="addmember-error" style="color:#e2a3a3;font-size:13px;margin-bottom:8px;"></div>
+    <input id="addmember-username" placeholder="Their exact username" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:16px;outline:none;" onkeydown="if(event.key==='Enter')submitAddMember('${serverId}')"/>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:8px 14px;border-radius:6px;font-size:13px;">Cancel</button>
+      <button onclick="submitAddMember('${serverId}')" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:8px 14px;border-radius:6px;font-size:13px;">Add</button>
+    </div>
+  </div>`);
+  setTimeout(()=>{ const el=document.getElementById('addmember-username'); if(el) el.focus(); },30);
+}
+window.submitAddMember = async function(serverId){
+  const uname = (document.getElementById('addmember-username').value||'').trim();
+  const errBox = document.getElementById('addmember-error');
+  if(!uname) return;
+  const target = await sGet('user:'+uname.toLowerCase());
+  if(!target){ errBox.textContent='No user with that username.'; return; }
+  const s = State.servers[serverId] || await sGet('server:'+serverId);
+  if((s.members||[]).some(m=>m.toLowerCase()===target.username.toLowerCase())){ errBox.textContent='Already a member.'; return; }
+  s.members.push(target.username);
+  await sSet('server:'+serverId, s);
+  State.servers[serverId]=s;
+  const list = await sGet('user-servers:'+target.username.toLowerCase()) || [];
+  if(!list.includes(serverId)){ list.push(serverId); await sSet('user-servers:'+target.username.toLowerCase(), list); }
+  State.usersCache[target.username]=target;
+  closeModal();
+  renderApp();
+}
+
+// ---- Create channel ----
+window.openCreateChannelModal = function(serverId){
+  showModal(`
+  <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:24px;width:320px;">
+    <div style="font-weight:600;font-size:16px;margin-bottom:14px;">Create a channel</div>
+    <input id="newchannel-name" placeholder="channel-name" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:16px;outline:none;" onkeydown="if(event.key==='Enter')submitCreateChannel('${serverId}')"/>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:8px 14px;border-radius:6px;font-size:13px;">Cancel</button>
+      <button onclick="submitCreateChannel('${serverId}')" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:8px 14px;border-radius:6px;font-size:13px;">Create</button>
+    </div>
+  </div>`);
+  setTimeout(()=>{ const el=document.getElementById('newchannel-name'); if(el) el.focus(); },30);
+}
+window.submitCreateChannel = async function(serverId){
+  let name = (document.getElementById('newchannel-name').value||'').trim().toLowerCase().replace(/\s+/g,'-');
+  if(!name) return;
+  const s = State.servers[serverId] || await sGet('server:'+serverId);
+  const ch = {id:uid('ch'), name};
+  s.channels = s.channels||[];
+  s.channels.push(ch);
+  await sSet('server:'+serverId, s);
+  State.servers[serverId]=s;
+  closeModal();
+  await openChannel(serverId, ch.id);
+}
+
+// ---- Create group ----
+window.openCreateGroupModal = function(){
+  const friendChecks = State.friends.map(f=>`
+    <label style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;">
+      <input type="checkbox" value="${esc(f)}" class="group-friend-check" />
+      ${avatarHTML(f,24)}
+      <span style="font-size:13px;">${esc(f)}</span>
+    </label>`).join('') || `<div style="color:var(--text-faint);font-size:13px;">Add some friends first.</div>`;
+  showModal(`
+  <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:24px;width:340px;">
+    <div style="font-weight:600;font-size:16px;margin-bottom:14px;">New group chat</div>
+    <input id="newgroup-name" placeholder="Group name" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:14px;outline:none;"/>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Add members</div>
+    <div style="max-height:160px;overflow-y:auto;margin-bottom:16px;">${friendChecks}</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:8px 14px;border-radius:6px;font-size:13px;">Cancel</button>
+      <button onclick="submitCreateGroup()" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:8px 14px;border-radius:6px;font-size:13px;">Create</button>
+    </div>
+  </div>`);
+  setTimeout(()=>{ const el=document.getElementById('newgroup-name'); if(el) el.focus(); },30);
+}
+window.submitCreateGroup = async function(){
+  const name = (document.getElementById('newgroup-name').value||'').trim() || 'New group';
+  const checked = Array.from(document.querySelectorAll('.group-friend-check:checked')).map(c=>c.value);
+  const members = Array.from(new Set([State.user.username, ...checked]));
+  const id = uid('grp');
+  const group = {id, name, icon:null, members};
+  await sSet('group:'+id, group);
+  for(const m of members){
+    const list = await sGet('user-groups:'+m.toLowerCase()) || [];
+    if(!list.includes(id)){ list.push(id); await sSet('user-groups:'+m.toLowerCase(), list); }
+  }
+  State.groups[id]=group;
+  closeModal();
+  await openGroup(id);
+}
+
+// ---- Profile view/edit ----
+window.openProfileModal = async function(username){
+  let u = State.usersCache[username];
+  if(!u){ u = await sGet('user:'+username.toLowerCase()); if(u) State.usersCache[username]=u; }
+  if(!u) return;
+  const isMe = u.username === State.user.username;
+  showModal(`
+  <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;width:340px;overflow:hidden;">
+    <div style="height:70px;background:linear-gradient(135deg, var(--brass-dim), var(--bg-elevated));"></div>
+    <div style="padding:0 20px 20px;margin-top:-38px;">
+      ${avatarHTML(u,76,{status:u.status||'online'})}
+      <div style="font-weight:700;font-size:18px;margin-top:10px;">${esc(u.username)}</div>
+      <div style="font-size:12px;color:var(--text-faint);text-transform:capitalize;margin-bottom:12px;">${esc(u.status||'online')}</div>
+      <div style="background:var(--bg-elevated);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:11px;letter-spacing:1px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:6px;">About</div>
+        <div style="font-size:13px;color:var(--text-primary);white-space:pre-wrap;line-height:1.5;">${u.bio?esc(u.bio):'<span style=\"color:var(--text-faint);\">No bio yet.</span>'}</div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+        ${isMe?`<button onclick="closeModal();openEditProfileModal()" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:8px 14px;border-radius:6px;font-size:13px;">Edit profile</button>`:`<button onclick="closeModal();openDM('${esc(u.username)}')" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:8px 14px;border-radius:6px;font-size:13px;">Message</button>`}
+        <button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:8px 14px;border-radius:6px;font-size:13px;">Close</button>
+      </div>
+    </div>
+  </div>`);
+}
+
+window.openEditProfileModal = function(){
+  const u = State.user;
+  showModal(`
+  <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:24px;width:340px;">
+    <div style="font-weight:600;font-size:16px;margin-bottom:16px;">Edit profile</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+      <div id="avatar-preview">${avatarHTML(u,60)}</div>
+      <div>
+        <input type="file" accept="image/*" id="avatar-file" style="display:none;" onchange="handleAvatarUpload(event)"/>
+        <button onclick="document.getElementById('avatar-file').click()" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);padding:7px 12px;border-radius:6px;font-size:12px;">Change photo</button>
+      </div>
+    </div>
+    <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Bio</label>
+    <textarea id="edit-bio" maxlength="200" rows="3" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:10px 12px;font-size:13px;margin-bottom:14px;outline:none;resize:none;">${esc(u.bio||'')}</textarea>
+    <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Status</label>
+    <select id="edit-status" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:9px 12px;font-size:13px;margin-bottom:20px;outline:none;">
+      <option value="online" ${u.status==='online'?'selected':''}>Online</option>
+      <option value="idle" ${u.status==='idle'?'selected':''}>Idle</option>
+      <option value="dnd" ${u.status==='dnd'?'selected':''}>Do not disturb</option>
+      <option value="invisible" ${u.status==='invisible'?'selected':''}>Invisible</option>
+    </select>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:8px 14px;border-radius:6px;font-size:13px;">Cancel</button>
+      <button onclick="submitEditProfile()" style="background:var(--brass);border:none;color:#1a1207;font-weight:700;padding:8px 14px;border-radius:6px;font-size:13px;">Save</button>
+    </div>
+  </div>`);
+}
+
+let pendingAvatar = null;
+window.handleAvatarUpload = function(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const size = 128;
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const scale = Math.max(size/img.width, size/img.height);
+      const w = img.width*scale, h = img.height*scale;
+      ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
+      pendingAvatar = canvas.toDataURL('image/jpeg', 0.82);
+      document.getElementById('avatar-preview').innerHTML = `<img src="${pendingAvatar}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;"/>`;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+window.submitEditProfile = async function(){
+  const bio = document.getElementById('edit-bio').value.trim();
+  const status = document.getElementById('edit-status').value;
+  State.user.bio = bio;
+  State.user.status = status;
+  if(pendingAvatar){ State.user.avatar = pendingAvatar; pendingAvatar = null; }
+  await sSet('user:'+State.user.username.toLowerCase(), State.user);
+  State.usersCache[State.user.username] = State.user;
+  closeModal();
+  renderApp();
+}
+
+// ---------- boot ----------
+function renderLoading(){
+  document.getElementById('app').innerHTML = `
+  <div style="min-height:600px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 20%, #1a1611 0%, #0c0a09 70%);">
+    <div style="text-align:center;">
+      <div style="width:56px;height:56px;border-radius:14px;overflow:hidden;margin:0 auto 14px;opacity:0.85;">
+        <img src="${LOGO_DATA_URI}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="BlackBox" />
+      </div>
+      <div style="color:var(--text-faint);font-size:13px;letter-spacing:1px;">Opening the door...</div>
+    </div>
+  </div>`;
+}
+
+async function initApp(){
+  renderLoading();
+  let remembered = null;
+  try { remembered = await sGet(SESSION_KEY, false); } catch(e){ remembered = null; }
+  if(remembered){
+    const user = await sGet('user:'+remembered.toLowerCase());
+    if(user){
+      State.usersCache[remembered] = user;
+      await bootSession(user);
+      return;
+    } else {
+      await sDel(SESSION_KEY, false);
+    }
+  }
+  renderAuth();
+}
+
+initApp();
+
+})();
+</script>
